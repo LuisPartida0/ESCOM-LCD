@@ -1,0 +1,14 @@
+mkdir reto-semana-01
+cd reto-semana-01
+mkdir tests
+
+git init
+echo "node_modules/\n__pycache__/\n*.pyc" > .gitignore
+git add .gitignore
+git commit -m "chore: inicializar estructura del proyecto y .gitignore"
+
+git add main.py
+git commit -m "feat: implementar lógica de limpieza y procesamiento de líneas"
+
+git add README.md
+git commit -m "docs: agregar instrucciones de uso y ejemplos en README"
