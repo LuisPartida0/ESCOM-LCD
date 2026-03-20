@@ -1,42 +1,76 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
+#include "cJSON.h" /* Librería necesaria para procesar JSON */
 
+/* Estructura para almacenar IDs únicos temporalmente */
 typedef struct {
-    char transaction_id[10];
-    int amount;
-} Transaction;
-
-/* Funci�n para verificar si el ID ya fue procesado */
-int is_duplicate(char *id, Transaction *unique_list, int count) {
-    int i;
-    for (i = 0; i < count; i++) {
-        if (strcmp(id, unique_list[i].transaction_id) == 0) return 1;
-    }
-    return 0;
-}
+    char id[20];
+} SeenID;
 
 int main() {
-    Transaction input[] = {
-        {"T1", 100}, {"T2", 200}, {"T1", 100}, {"T3", 300}, {"T2", 999}
-    };
-    int n = sizeof(input) / sizeof(input[0]);
-    Transaction *unique_list = (Transaction*)malloc(n * sizeof(Transaction));
-    int unique_count = 0;
-    int i;
+    FILE *file;
+    char *buffer;
+    long length;
+    cJSON *json_root, *item;
+    int i, j, n, is_dup;
+    
+    /* Arreglo para rastrear IDs ya procesados */
+    SeenID *seen_list;
+    int seen_count = 0;
 
+    /* 1. Cargar el archivo .json */
+    file = fopen("transaction.json", "rb");
+    if (!file) return 1;
+    fseek(file, 0, SEEK_END);
+    length = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    buffer = malloc(length + 1);
+    fread(buffer, 1, length, file);
+    fclose(file);
+    buffer[length] = '\0';
+
+    /* 2. Parsear el contenido JSON */
+    json_root = cJSON_Parse(buffer);
+    n = cJSON_GetArraySize(json_root);
+    seen_list = (SeenID*)malloc(n * sizeof(SeenID));
+
+    /* 3. DESPLEGAR LISTA ORIGINAL */
+    printf("=== LISTA ORIGINAL DE REGISTROS ===\n");
     for (i = 0; i < n; i++) {
-        if (!is_duplicate(input[i].transaction_id, unique_list, unique_count)) {
-            unique_list[unique_count] = input[i];
-            unique_count++;
+        item = cJSON_GetArrayItem(json_root, i);
+        printf("ID: %-5s | Amount: %d\n", 
+               cJSON_GetObjectItem(item, "transaction_id")->valuestring,
+               cJSON_GetObjectItem(item, "amount")->valueint);
+    }
+
+    /* 4. FILTRAR Y DESPLEGAR LISTA SIN DUPLICADOS */
+    printf("\n=== LISTA SIN DUPLICADOS (Primera Aparicion) ===\n");
+    for (i = 0; i < n; i++) {
+        item = cJSON_GetArrayItem(json_root, i);
+        char *current_id = cJSON_GetObjectItem(item, "transaction_id")->valuestring;
+        int current_amount = cJSON_GetObjectItem(item, "amount")->valueint;
+
+        /* Comprobar si el ID ya fue visto */
+        is_dup = 0;
+        for (j = 0; j < seen_count; j++) {
+            if (strcmp(current_id, seen_list[j].id) == 0) {
+                is_dup = 1;
+                break;
+            }
+        }
+
+        /* Si no es duplicado, lo mostramos y lo agregamos a 'vistos' */
+        if (!is_dup) {
+            printf("ID: %-5s | Amount: %d\n", current_id, current_amount);
+            strcpy(seen_list[seen_count].id, current_id);
+            seen_count++;
         }
     }
 
-    printf("Lista Limpia:\n");
-    for (i = 0; i < unique_count; i++) {
-        printf("ID: %s, Amount: %d\n", unique_list[i].transaction_id, unique_list[i].amount);
-    }
-
-    free(unique_list);
+    /* Limpieza de memoria */
+    free(buffer);
+    free(seen_list);
+    cJSON_Delete(json_root);
     return 0;
 }
