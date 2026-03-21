@@ -9,3 +9,6 @@ Este programa estandariza reportes de clima internacionales. Convierte temperatu
 
 ```bash
 python main.py < tests/entrada1.txt
+
+### Autor:
+Luis Fernando Partida Martinez - Estudiante de Ciencia de Datos (ESCOM)
