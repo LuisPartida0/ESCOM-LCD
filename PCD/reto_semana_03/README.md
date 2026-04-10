@@ -1,4 +1,4 @@
-# Clasificador de Temperaturas (Reto 02)
+# Clasificador de Temperaturas (Reto 03)
 
 ## Descripción
 Este programa es una herramienta de procesamiento de datos diseñada para consolidar transacciones diarias de una tienda de tecnología. Su función principal es transformar una lista de ventas individuales en un reporte ejecutivo agrupado por producto, permitiendo identificar rápidamente los artículos más rentables mediante el análisis de ingresos y precios promedio.
@@ -28,6 +28,10 @@ Ejecución en Terminal
 
 # Ejecución básica con redirección de archivo
 python main.py < tests/entrada1.txt
+
+## Autor:
+Luis Fernando Partida Martinez - Estudiante de Ciencia de Datos (ESCOM)
+
 
 # Guardar el reporte en un nuevo archivo
 python main.py < tests/entrada1.txt > reporte_consolidado.csv
