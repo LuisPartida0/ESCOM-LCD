@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <limits.h>
 
-/* Usamos inline para optimizar el rendimiento en C99, 
+/* Usamos la funcion inline para optimizar el rendimiento  
    evitando la sobrecarga de la llamada a la funcion */
 static inline int max(int a, int b, int c) {
     int m = a;
@@ -16,7 +16,7 @@ int max_cruce(const int *__restrict A, int izq, int mid, int der)
     int suma_izq = INT_MIN;
     int suma_der = INT_MIN;
     int suma_actual = 0;
-    int i; /* Declaracion fuera del for para compatibilidad estricta */
+    int i;
 
     /* Parte izquierda del cruce */
     for (i = mid; i >= izq; i--) {
