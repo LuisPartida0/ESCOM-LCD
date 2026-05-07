@@ -1,4 +1,5 @@
 sku,nombre,categoria,precio,stock,stock_minimo
+
 SKU00001,Chromebook Seagate,Electronica,6483.83,23,25
 SKU00002,Barra Sonido Dell,Audio,8117.31,43,30
 SKU00003,Mousepad,Accesorios,424.89,22,50
@@ -89,13 +90,22 @@ SKU00087,Capturadora Video,Video,3981.09,7,15
 SKU00088,Bocina Bluetooth Corsair,Audio,3029.39,25,15
 SKU00089,Barra Sonido Corsair,Audio,5501.40,45,50
 SKU00090,Touchpad Asus,Accesorios,1621.07,12,20
-SKU00091,Barra Sonido Lenovo,Audio,4111.25,5,10
-SKU00092,Cable USB C,Cables,177.12,14,10
-SKU00093,MacBook Lenovo,Electronica,36631.35,5,20
-SKU00094,Monitor Gaming Logitech,Electronica,6980.43,14,null
-SKU00095,Monitor SanDisk,Electronica,4040.52,0,5
-SKU00096,Stylus Razer,Accesorios,2379.02,128,50
-SKU00097,Ultrabook BenQ,Electronica,20289.90,28,10
-SKU00098,Laptop Razer,Electronica,19311.05,30,20
-SKU00099,Mouse Ergonomico Samsung,Accesorios,747.46,8,5
-SKU00100,Soporte Monitor,Accesorios,sin_dato,13,20
+SKU00091,Laptop HP,Electronica,15000.00,5,10
+SKU00092,Mouse Logitech,Accesorios,350.00,3,15
+SKU00093,Cable HDMI,Cables,N/A,12,5
+SKU00094,Monitor LG,Electronica,6000.00,abc,5
+SKU00095,Audifonos Sony,Accesorios,1200.00,2,???
+SKU00096,Webcam HD,Accesorios
+SKU00097,SSD 1TB,Almacenamiento,1800.00,0,5,dato_extra,otro
+SKU00098,Teclado Mecanico,Accesorios,800.00,20,10
+SKU00099,SSD Externo,Almacenamiento,1800.00,0,5
+SKU00100,Barra Sonido Lenovo,Audio,4111.25,5,10
+SKU00101,Cable USB C,Cables,177.12,14,10
+SKU00102,MacBook Lenovo,Electronica,36631.35,5,20
+SKU00103,Monitor Gaming Logitech,Electronica,6980.43,14,null
+SKU00104,Monitor SanDisk,Electronica,4040.52,0,5
+SKU00105,Stylus Razer,Accesorios,2379.02,128,50
+SKU00106,Ultrabook BenQ,Electronica,20289.90,28,10
+SKU00107,Laptop Razer,Electronica,19311.₀5,3₀,2₀
+SKU00108,Mouse Ergonomico Samsung,Accesorios,747.46,8,5
+SKU00109,Soporte Monitor,Accesorios,sin_dato,13,20
