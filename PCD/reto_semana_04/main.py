@@ -1,32 +1,88 @@
+import os
+import sys
+sys.path.append(os.path.dirname(__file__))
 from models.producto import Producto
-from utils.validators import validar_producto
+from utils.validators import validar_Producto
 from utils.io import leer_inventario, escribir_reporte
 
-def main():
-    print("Iniciando Sistema de Inventario Modular...")
-    datos_raw = leer_inventario("data/inventario.csv")
-    productos_validos = []
 
-    for item in datos_raw:
-        v = item['datos']
-        # Validar antes de instanciar (Regla de Robustez)
-        es_valido, error = validar_producto(
-            v[0] if len(v)>0 else "", v[1] if len(v)>1 else "", 
-            v[3] if len(v)>3 else "", v[4] if len(v)>4 else "", 
-            v[5] if len(v)>5 else "", len(v)
+# Configuración
+ARCHIVO_INVENTARIO = os.path.join("data", "inventario.csv")
+ARCHIVO_REPORTE = os.path.join("outputs", "reporte_inventario.csv")
+
+
+def crear_productos(datos_raw):
+    """Convierte lista de diccionarios en objetos Producto, ignorando inválidos."""
+    productos = []
+    for datos in datos_raw:
+        es_valido, error = validar_Producto(
+            datos.get('sku'),
+            datos.get('nombre'),
+            datos.get('categoria'),
+            datos.get('precio'),
+            datos.get('stock'),
+            datos.get('stock_minimo')
         )
-        
-        if es_valido:
-            productos_validos.append(Producto(v[0], v[1], v[2], v[3], v[4], v[5]))
-        else:
-            print(f"Advertencia: Registro ignorado -> {error}")
+        if not es_valido:
+            print(f"Advertencia: Ignorando registro - {error}")
+            continue
+        producto = Producto(
+            sku=datos['sku'],
+            nombre=datos['nombre'],
+            categoria=datos['categoria'],
+            precio=float(datos['precio']),
+            stock=int(datos['stock']),
+            stock_minimo=int(datos['stock_minimo'])
+        )
+        productos.append(producto)
+    return productos
 
-    # Filtrar y Ordenar Descendente por faltantes
-    reorden = [p for p in productos_validos if p.necesita_reorden()]
-    reorden.sort(key=lambda x: x.unidades_faltantes(), reverse=True)
 
-    escribir_reporte(reorden, "outputs/reporte_inventario.csv")
-    print(f"Proceso completo. Reporte generado con {len(reorden)} productos.")
+def filtrar_necesitan_reorden(productos):
+    return [p for p in productos if p.Controlar_Stock()]
+
+
+def ordenar_por_faltantes(productos):
+    return sorted(productos, key=lambda p: p.unidades_faltantes(), reverse=True)
+
+
+def main():
+    print("=" * 50)
+    print("SISTEMA DE INVENTARIO - Reporte de Reorden")
+    print("=" * 50)
+
+    # Leer datos
+    print(f"\nLeyendo inventario de: {ARCHIVO_INVENTARIO}")
+    try:
+        datos_raw = leer_inventario(ARCHIVO_INVENTARIO)
+    except FileNotFoundError:
+        print(f"ERROR: No se encontró el archivo '{ARCHIVO_INVENTARIO}'.")
+        return
+
+    print(f"Registros leídos: {len(datos_raw)}")
+
+    #  Crear objetos Producto
+    productos = crear_productos(datos_raw)
+    print(f"Productos válidos: {len(productos)}")
+
+    #  Filtrar y ordenar
+    necesitan = ordenar_por_faltantes(filtrar_necesitan_reorden(productos))
+    print(f"Productos con necesidad de reorden: {len(necesitan)}")
+
+    #  Mostrar resumen
+    print("\n" + "-" * 50)
+    print("PRODUCTOS QUE NECESITAN REORDEN:")
+    print("-" * 50)
+    for p in necesitan:
+        print(p)
+
+    #  Escribir reporte
+    escribir_reporte(necesitan, ARCHIVO_REPORTE)
+    print(f"\nReporte guardado en: {ARCHIVO_REPORTE}")
+    print("\n" + "=" * 50)
+    print("Proceso completado exitosamente")
+    print("=" * 50)
+
 
 if __name__ == "__main__":
     main()
