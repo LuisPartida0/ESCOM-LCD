@@ -1,6 +1,4 @@
 import os
-import sys
-sys.path.append(os.path.dirname(__file__))
 from models.producto import Producto
 from utils.validators import validar_Producto
 from utils.io import leer_inventario, escribir_reporte
