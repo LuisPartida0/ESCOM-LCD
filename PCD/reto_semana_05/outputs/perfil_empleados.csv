@@ -1,0 +1,7 @@
+nombre_columna,tipo_inferido,total_registros,valores_nulos,porcentaje_nulos,valores_unicos,porcentaje_unicos,ejemplo_valor
+id,booleano,160,0,0.0,160,100.0,1
+nombre,texto,160,0,0.0,160,100.0,Empleado 1
+email,texto,160,0,0.0,160,100.0,emp1@empresa.com
+departamento,texto,160,0,0.0,4,2.5,Ventas
+salario,numerico,160,0,0.0,160,100.0,31752.21
+activo,booleano,160,0,0.0,2,1.25,yes

@@ -1,0 +1,6 @@
+nombre_columna,tipo_inferido,total_registros,valores_nulos,porcentaje_nulos,valores_unicos,porcentaje_unicos,ejemplo_valor
+timestamp,fecha,160,0,0.0,160,100.0,2026-06-01 00:00:00
+sensor_id,texto,160,0,0.0,5,3.12,S005
+temperatura,numerico,160,12,7.5,144,90.0,20.02
+humedad,numerico,160,15,9.38,41,25.62,63
+bateria,numerico,160,0,0.0,80,50.0,84
