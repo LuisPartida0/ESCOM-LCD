@@ -78,7 +78,7 @@ def main():
         salida = os.path.join(directorio_out, f"perfil_{archivo.replace('.csv', '.txt')}")
         
         if perfilar_archivo(entrada, salida):
-            print(f"✅ Reporte generado: {salida}")
+            print(f" Reporte generado: {salida}")
 
 if __name__ == "__main__":
     main()
