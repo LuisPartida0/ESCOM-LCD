@@ -8,7 +8,7 @@ El programa lee datos desde la entrada estándar (`stdin`).
 
 ### En Linux / Mac / PowerShell:
 ```bash
-python main.py < tests/entrada1.txt
+python3 main.py < tests/entrada1.txt main.py < tests/entrada1.txt
 
 ## Ejemplo de entrada:
 1.9, 2.1, 3.7
