@@ -1,84 +1,72 @@
-import os
+import argparse
 import csv
+import os
+from datetime import datetime
 
-def perfilar_archivo(ruta_entrada, ruta_salida):
-    """Analiza un CSV y genera un reporte de calidad en formato de texto."""
+def inferir_tipo(valor):
+    if not valor: return None
+    # Booleano
+    if valor.lower() in ['true', 'false', 'yes', 'no', '1', '0']:
+        return "booleano"
+    # Fecha
+    for formato in ['%Y-%m-%d', '%Y-%m-%d %H:%M:%S']:
+        try:
+            datetime.strptime(valor, formato)
+            return "fecha"
+        except ValueError: continue
+    # Numerico
     try:
-        with open(ruta_entrada, 'r', encoding='utf-8') as f:
-            # Usar Sniffer para detectar el dialecto (comas, puntos y comas, etc.)
-            dialecto = csv.Sniffer().sniff(f.read(2048))
-            f.seek(0)
-            lector = csv.reader(f, dialecto)
-            
-            encabezados = next(lector)
-            filas = list(lector)
-            
-        num_columnas = len(encabezados)
-        num_filas = len(filas)
-        
-        # Contadores de nulos
-        nulos_por_columna = [0] * num_columnas
-        # Para detectar duplicados (usamos tuplas ya que son hashables)
-        registros_unicos = set()
-        duplicados = 0
-        
-        for fila in filas:
-            # Validar integridad de la fila
-            if len(fila) != num_columnas:
-                continue
-                
-            # Contar nulos
-            for i in range(num_columnas):
-                if not fila[i].strip():
-                    nulos_por_columna[i] += 1
-            
-            # Contar duplicados
-            registro = tuple(fila)
-            if registro in registros_unicos:
-                duplicados += 1
-            else:
-                registros_unicos.add(registro)
+        float(valor)
+        return "numerico"
+    except ValueError:
+        return "texto"
 
-        # Escribir el reporte de salida
-        with open(ruta_salida, 'w', encoding='utf-8') as f_out:
-            f_out.write(f"REPORTE DE PERFILAMIENTO: {os.path.basename(ruta_entrada)}\n")
-            f_out.write("=" * 50 + "\n")
-            f_out.write(f"Total de Registros: {num_filas}\n")
-            f_out.write(f"Total de Columnas: {num_columnas}\n")
-            f_out.write(f"Registros Duplicados: {duplicados}\n\n")
-            f_out.write(f"{'Columna':<20} | {'Nulos':<10}\n")
-            f_out.write("-" * 35 + "\n")
-            
-            for i in range(num_columnas):
-                f_out.write(f"{encabezados[i]:<20} | {nulos_por_columna[i]:<10}\n")
-                
-        return True
-    except Exception as e:
-        print(f"Error procesando {ruta_entrada}: {e}")
-        return False
+def perfilar(input_path, output_path):
+    with open(input_path, 'r', encoding='utf-8') as f:
+        reader = list(csv.reader(f))
+        if not reader: return
+        headers = reader[0]
+        filas = reader[1:]
+        total_filas = len(filas)
 
-def main():
-    directorio_data = "data"
-    directorio_out = "outputs"
-    
-    # Crear carpeta de salida si no existe
-    if not os.path.exists(directorio_out):
-        os.makedirs(directorio_out)
+    perfil_data = []
+    for i, col_name in enumerate(headers):
+        valores = [fila[i] for fila in filas if i < len(fila)]
+        valores_no_nulos = [v for v in valores if v.strip()]
         
-    print("Iniciando perfilador automático...")
-    
-    archivos = [f for f in os.listdir(directorio_data) if f.endswith('.csv')]
-    
-    if not archivos:
-        print("No se encontraron archivos CSV en la carpeta /data")
-        return
+        # Tipo Inferido (basado en el primer valor no nulo)
+        ejemplo = valores_no_nulos[0] if valores_no_nulos else ""
+        tipo = inferir_tipo(ejemplo) if ejemplo else "texto"
+        
+        # Métricas
+        nulos = total_filas - len(valores_no_nulos)
+        unicos = len(set(valores_no_nulos))
+        
+        perfil_data.append({
+            "nombre_columna": col_name,
+            "tipo_inferido": tipo,
+            "total_registros": total_filas,
+            "valores_nulos": nulos,
+            "porcentaje_nulos": round((nulos / total_filas) * 100, 2),
+            "valores_unicos": unicos,
+            "porcentaje_unicos": round((unicos / total_filas) * 100, 2),
+            "ejemplo_valor": ejemplo
+        })
 
-    for archivo in archivos:
-        entrada = os.path.join(directorio_data, archivo)
-        salida = os.path.join(directorio_out, f"perfil_{archivo.replace('.csv', '.txt')}")
-        
-        if perfilar_archivo(entrada, salida):
-            print(f" Reporte generado: {salida}")
+    # Escritura del Perfil
+    output_headers = ["nombre_columna", "tipo_inferido", "total_registros", "valores_nulos", 
+                      "porcentaje_nulos", "valores_unicos", "porcentaje_unicos", "ejemplo_valor"]
+    
+    with open(output_path, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.DictWriter(f, fieldnames=output_headers)
+        writer.writeheader()
+        writer.writerows(perfil_data)
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Perfilador de Datasets CSV")
+    parser.add_argument("--input", "-i", required=True, help="Ruta al CSV de entrada")
+    parser.add_argument("--output", "-o", required=True, help="Ruta al CSV de salida")
+    args = parser.parse_args()
+    
+    perfilar(args.input, args.output)
+    print(f"Perfil generado exitosamente en: {args.output}")
