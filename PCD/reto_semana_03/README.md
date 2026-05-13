@@ -1,4 +1,4 @@
-# Clasificador de Temperaturas (Reto 03)
+# Analizador de Ventas (Reto 03)
 
 ## Descripción
 Este programa es una herramienta de procesamiento de datos diseñada para consolidar transacciones diarias de una tienda de tecnología. Su función principal es transformar una lista de ventas individuales en un reporte ejecutivo agrupado por producto, permitiendo identificar rápidamente los artículos más rentables mediante el análisis de ingresos y precios promedio.
