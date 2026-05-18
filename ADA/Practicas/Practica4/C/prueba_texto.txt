@@ -1,0 +1,5 @@
+Tres tristes tigres tragaban trigo en un trigal. 
+El algoritmo de Huffman es un metodo de compresion de datos sin perdida.
+Divide y venceras es un paradigma de diseño de algoritmos muy poderoso.
+Estructuras de datos dinamicas como los min-heaps y los arboles binarios 
+son fundamentales para la computacion moderna en este 2026.
