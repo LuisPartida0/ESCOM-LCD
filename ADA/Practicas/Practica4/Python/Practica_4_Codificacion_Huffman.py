@@ -1,84 +1,119 @@
 import heapq
 from collections import Counter
 
-class NodoHuffman:
-    def __init__(self, char, freq):
-        self.char = char
-        self.freq = freq
-        self.izq = None
-        self.der = None
+# -----------------------------
+# Nodo del árbol de Huffman
+# -----------------------------
+class Nodo:
+    def __init__(self, caracter, frecuencia):
+        self.caracter = caracter
+        self.frecuencia = frecuencia
+        self.izquierda = None
+        self.derecha = None
 
-    # Definir comparación para el min-heap
     def __lt__(self, otro):
-        return self.freq < otro.freq
+        return self.frecuencia < otro.frecuencia
 
-def construir_arbol(frecuencias):
-    heap = [NodoHuffman(char, freq) for char, freq in frecuencias.items()]
-    heapq.heapify(heap)
-    
+
+# -----------------------------
+# Construcción del árbol
+# -----------------------------
+def construir_arbol(texto):
+    frecuencias = Counter(texto)
+
+    heap = []
+
+    for caracter, frecuencia in frecuencias.items():
+        heapq.heappush(heap, Nodo(caracter, frecuencia))
+
     while len(heap) > 1:
-        nodo1 = heapq.heappop(heap)
-        nodo2 = heapq.heappop(heap)
-        fusion = NodoHuffman(None, nodo1.freq + nodo2.freq)
-        fusion.izq = nodo1
-        fusion.der = nodo2
-        heapq.heappush(heap, fusion)
-    return heap[0]
+        izquierda = heapq.heappop(heap)
+        derecha = heapq.heappop(heap)
 
-def generar_tabla(nodo, codigo_actual, tabla):
+        nuevo = Nodo(None, izquierda.frecuencia + derecha.frecuencia)
+        nuevo.izquierda = izquierda
+        nuevo.derecha = derecha
+
+        heapq.heappush(heap, nuevo)
+
+    return heap[0], frecuencias
+
+
+# -----------------------------
+# Generación de códigos
+# -----------------------------
+def generar_codigos(nodo, codigo_actual="", codigos={}):
     if nodo is None:
         return
-    if nodo.char is not None:
-        tabla[nodo.char] = codigo_actual
-    generar_tabla(nodo.izq, codigo_actual + "0", tabla)
-    generar_tabla(nodo.der, codigo_actual + "1", tabla)
 
-def huffman_workflow(ruta_archivo):
-    # 1. Leer archivo
-    with open(ruta_archivo, 'r', encoding='utf-8') as f:
-        texto = f.read()
+    if nodo.caracter is not None:
+        codigos[nodo.caracter] = codigo_actual
 
-    # 2. Frecuencias
-    frecuencias = Counter(texto)
-    
-    # 3. Árbol y 4. Tabla
-    raiz = construir_arbol(frecuencias)
-    tabla = {}
-    generar_tabla(raiz, "", tabla)
-    
-    # 5. Codificar
-    codificado = "".join(tabla[char] for char in texto)
-    
-    # 6. Decodificar para verificar
-    decodificado = ""
+    generar_codigos(nodo.izquierda, codigo_actual + "0", codigos)
+    generar_codigos(nodo.derecha, codigo_actual + "1", codigos)
+
+    return codigos
+
+
+# -----------------------------
+# Codificación
+# -----------------------------
+def codificar(texto, codigos):
+    return ''.join(codigos[c] for c in texto)
+
+
+# -----------------------------
+# Decodificación
+# -----------------------------
+def decodificar(bits, raiz):
+    resultado = ""
     actual = raiz
-    for bit in codificado:
-        actual = actual.izq if bit == '0' else actual.der
-        if actual.char:
-            decodificado += actual.char
+
+    for bit in bits:
+        if bit == '0':
+            actual = actual.izquierda
+        else:
+            actual = actual.derecha
+
+        if actual.caracter is not None:
+            resultado += actual.caracter
             actual = raiz
 
-    print("\n--- RESULTADOS DEL PROCESAMIENTO ---")
-    print(f"Texto Original (Muestra):\n{texto[:100]}...\n")
-    print(f"Bits de salida (primeros 100):\n{codificado[:100]}\n")
-    print(f"Verificación de integridad: {'EXITOSA (El texto coincide al 100%)' if decodificado == texto else 'FALLIDA'}")
+    return resultado
 
-# ==========================================
-# SECCIÓN DE EJECUCIÓN
-# ==========================================
-if __name__ == "__main__":
-    # Contenido proporcionado para la prueba
-    contenido = """Tres tristes tigres tragaban trigo en un trigal. 
-El algoritmo de Huffman es un metodo de compresion de datos sin perdida.
-Divide y venceras es un paradigma de diseño de algoritmos muy poderoso.
-Estructuras de datos dinamicas como los min-heaps and los arboles binarios 
-son fundamentales para la computacion moderna en este 2026."""
 
-    # 1. Creación y escritura del archivo de texto
-    with open("prueba_texto.txt", "w", encoding="utf-8") as archivo:
-        archivo.write(contenido)
+# -----------------------------
+# Programa principal
+# -----------------------------
+# Nombre fijo del archivo
+ruta = r"D:\ESCOM\practica4\python\prueba_texto.txt"
 
-    print("Archivo 'prueba_texto.txt' creado con exito.")
+with open(ruta, "r", encoding="utf-8") as archivo:
+    texto = archivo.read()
 
-    # 2. Llamada automática al flujo de Huffman con el archivo recién creado
-    huffman_workflow('prueba_texto.txt')
+raiz, frecuencias = construir_arbol(texto)
+
+print("\nFrecuencias:")
+for c, f in frecuencias.items():
+    print(f"'{c}': {f}")
+
+codigos = generar_codigos(raiz)
+
+print("\nCódigos Huffman:")
+for c, codigo in codigos.items():
+    print(f"'{c}': {codigo}")
+
+texto_codificado = codificar(texto, codigos)
+
+print("\nTexto codificado:")
+print(texto_codificado)
+
+texto_decodificado = decodificar(texto_codificado, raiz)
+
+print("\nTexto decodificado:")
+print(texto_decodificado)
+
+if texto == texto_decodificado:
+    print("\nVerificación EXITOSA: el texto coincide.")
+else:
+    print("\nError: los textos no coinciden.")
