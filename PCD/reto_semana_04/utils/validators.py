@@ -67,4 +67,4 @@ def validar_Producto(sku, nombre, categoria, precio, stock, stock_minimo):
     if not Validar_Stock(stock_minimo):
         return False, "Stock mínimo inválido: debe ser un número entero mayor o igual a 0."
     
-    return True, Nones
+    return True, None
