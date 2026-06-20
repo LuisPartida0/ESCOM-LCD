@@ -1,4 +1,4 @@
-ssku,nombre,categoria,stock_actual,stock_minimo,unidades_faltantes,valor_inventario
+sku,nombre,categoria,stock_actual,stock_minimo,unidades_faltantes,valor_inventario
 SKU48590,MacBook LG,Electronica,3,50,47,106789.20
 SKU31368,NAS SanDisk,Almacenamiento,16,50,34,328124.32
 SKU31371,Teclado WD,Accesorios,7,25,18,8465.24
